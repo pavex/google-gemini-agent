@@ -1,38 +1,38 @@
 # Gemini Agent CLI
 
-CLI agent postavený na **Vercel AI SDK** (`ai` + `@ai-sdk/google`) s podporou MCP serverů.
+A CLI agent built on **Vercel AI SDK** (`ai` + `@ai-sdk/google`) with support for MCP (Model Context Protocol) servers.
 
-## Použití
+## Usage
 
 ```bash
 # Build
 npm run build
 
-# Spustit (API key jako argument)
+# Run (API key as an argument)
 node bundle/agent.js YOUR_API_KEY
 
-# Nebo přes npm
+# Or via npm
 npm run dev YOUR_API_KEY
 
-# Alternativně přes env proměnnou
+# Alternatively via environment variable
 set GEMINI_API_KEY=YOUR_API_KEY && node bundle/agent.js
 ```
 
-## Konfigurace
+## Configuration
 
-Při prvním spuštění se vytvoří `agent.json` s výchozím nastavením.
+Upon the first run, an `agent.json` file is created with default settings.
 
-Klíčové volby v `agent.json`:
+Key options in `agent.json`:
 
-| Klíč | Popis | Default |
+| Key | Description | Default |
 |------|-------|---------|
-| `identity` | Jméno agenta v terminálu | `"agent"` |
+| `identity` | Agent name in the terminal | `"agent"` |
 | `model` | Gemini model | `"gemini-2.0-flash"` |
-| `max_steps` | Max iterací tool call loop | `15` |
-| `audit.show` | Zobrazovat [Tool Call] / [Tool Result] | `true` |
-| `mcp.servers` | Seznam MCP serverů | `[]` |
+| `max_steps` | Max tool call loop iterations | `15` |
+| `audit.show` | Show [Tool Call] / [Tool Result] | `true` |
+| `mcp.servers` | List of MCP servers | `[]` |
 
-### MCP servery
+### MCP Servers
 
 ```json
 {
@@ -49,34 +49,34 @@ Klíčové volby v `agent.json`:
 }
 ```
 
-## Příkazy
+## Commands
 
-| Příkaz | Popis |
+| Command | Description |
 |--------|-------|
-| `/help` | Nápověda |
-| `/exit` | Ukončit |
-| `/clear` | Vymazat historii |
-| `/tools` | Seznam MCP nástrojů |
-| `/context` | Využití kontextového okna |
+| `/help` | Help |
+| `/exit` | Exit |
+| `/clear` | Clear history |
+| `/tools` | List MCP tools |
+| `/context` | Context window usage |
 
-## Architektura
+## Architecture
 
 ```
 src/
-  agent.js        ← hlavní smyčka (readline + generateText)
+  agent.js        ← Main loop (readline + generateText)
   lib/
-    config.js     ← načítání konfigurace
-    mcp.js        ← MCP klient (stdio JSON-RPC 2.0)
+    config.js     ← Configuration loading
+    mcp.js        ← MCP client (stdio JSON-RPC 2.0)
     tools.js      ← MCP ↔ ai-sdk tool() bridge + jsonSchemaToZod
-    ui.js         ← terminal output helpers
-    context.js    ← token estimace + sliding window trim
+    ui.js         ← Terminal output helpers
+    context.js    ← Token estimation + sliding window trim
 bundle/
-  agent.js        ← esbuild výstup (spustitelný)
+  agent.js        ← esbuild output (executable)
 ```
 
-## Klíčový rozdíl od google-gemini-chat
+## Key difference from google-gemini-chat
 
-`google-gemini-chat` volá Gemini REST API přímo. Tento agent používá **Vercel AI SDK**:
-- `generateText()` s `maxSteps` automaticky řeší tool call smyčku
-- MCP tools jsou převedeny na ai-sdk `tool()` formát s Zod schématy
-- Jednodušší kód — SDK zajišťuje retry, tool loop, streaming
+`google-gemini-chat` calls the Gemini REST API directly. This agent uses **Vercel AI SDK**:
+- `generateText()` with `maxSteps` automatically handles the tool call loop.
+- MCP tools are converted to ai-sdk `tool()` format with Zod schemas.
+- Simpler code — the SDK handles retries, tool loops, and streaming.
